@@ -11,16 +11,31 @@ let board = Array(9).fill(null);
 let currentPlayer = 'X';
 let isGameOver = false; // Defina isGameOver aqui no escopo global
 
+const playerSockets = {}; // Objeto para rastrear jogadores associados a sockets
+
 io.on('connection', (socket) => {
-    socket.emit('initialState', { board, currentPlayer });
+    // Associe o jogador X ou O ao socket com base na disponibilidade
+    if (!playerSockets['X']) {
+        playerSockets['X'] = socket;
+        socket.emit('initialState', { board, currentPlayer: 'X' });
+    } else if (!playerSockets['O']) {
+        playerSockets['O'] = socket;
+        socket.emit('initialState', { board, currentPlayer: 'O' });
+    } else {
+        // Caso ambos os jogadores já estejam conectados, rejeite a conexão
+        socket.disconnect();
+        return;
+    }
 
     socket.on('playMove', ({ cellIndex }) => {
         if (isGameOver) {
             return;
         }
 
-        if (board[cellIndex] === null) {
-            board[cellIndex] = currentPlayer;
+        const player = Object.keys(playerSockets).find((key) => playerSockets[key] === socket);
+
+        if (player === currentPlayer && board[cellIndex] === null) {
+            board[cellIndex] = player;
             io.emit('initialState', { board, currentPlayer });
 
             if (checkWinner() || board.every((cell) => cell !== null)) {
@@ -38,6 +53,14 @@ io.on('connection', (socket) => {
         currentPlayer = 'X';
         isGameOver = false;
         io.emit('restartGame');
+    });
+
+    socket.on('disconnect', () => {
+        // Ao desconectar, remova a associação do jogador ao socket
+        const player = Object.keys(playerSockets).find((key) => playerSockets[key] === socket);
+        if (player) {
+            delete playerSockets[player];
+        }
     });
 });
 
