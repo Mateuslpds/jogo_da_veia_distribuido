@@ -12,6 +12,11 @@ socket.on('gameOver', (result) => {
     // Manipule o evento de jogo terminado (vitória, derrota, empate)
     isGameOver = true;
     alert(result);
+
+    // Reinicie o jogo após o alerta
+    restartGame();
+    // Lógica para limpar o tabuleiro ou redefinir o estado do jogo
+    renderBoard(Array(9).fill(null));
 });
 
 socket.on('restartGame', () => {
