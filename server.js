@@ -39,7 +39,7 @@ io.on('connection', (socket) => {
             io.emit('initialState', { board, currentPlayer });
 
             if (checkWinner() || board.every((cell) => cell !== null)) {
-                io.emit('gameOver', `O jogo terminou. Resultado: ${checkWinner() ? 'VITÓRIA' : 'EMPATE'}`);
+                io.emit('gameOver', `Resultado: ${checkWinner() ? `VITÓRIA DO JOGADOR ${currentPlayer}` : 'EMPATE'}`);
                 isGameOver = true;
             } else {
                 // Alternar para o próximo jogador
