@@ -22,7 +22,8 @@ socket.on('gameOver', (result) => {
 socket.on('restartGame', () => {
     // Reinicie o jogo
     isGameOver = false;
-    // Lógica para limpar o tabuleiro ou redefinir o estado do jogo
+
+    location.reload();
 });
 
 function renderBoard(board) {
@@ -57,3 +58,12 @@ function restartGame() {
     // Solicite ao servidor para reiniciar o jogo
     socket.emit('restartGame');
 }
+
+// Seletor do botão de reinício
+const restartButton = document.getElementById('restartButton');
+
+// Adicione um manipulador de eventos para o clique no botão de reinício
+restartButton.addEventListener('click', () => {
+    // Solicita ao servidor para reiniciar o jogo
+    restartGame();
+});
